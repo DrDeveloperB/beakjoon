@@ -8,6 +8,7 @@
         - step_list.txt
         - 문제번호 앞에 step_ 단어를 붙임
             1. 입출력과 사칙연산 : https://www.acmicpc.net/step/1
+            2. 조건문 : https://www.acmicpc.net/step/4
     2. 알고리즘 분류
         - https://www.acmicpc.net/problem/tags
         - algorithm_list.txt
