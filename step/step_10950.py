@@ -31,10 +31,14 @@ open(0) = sys.stdin (0 은 표준 입력)
 [*open(0)] = 입력 값을 라인별 리스트로 반환 ([line0, line1, ...])
 [*open(0)][1:] = 0번째 라인 제외
 """
-for line in [*open(0)][1:]:
-    print(sum([i for i in map(int, line.split())]))
+# for line in [*open(0)][1:]:
+#     print(sum([i for i in map(int, line.split())]))
 
 # 정답 4
+# [정답 3] 을 한줄 코딩
+print('\n'.join([str(sum(map(int, line.split()))) for line in [*open(0)][1:]]))
+
+# 정답 5
 # line 값을 문자 하나씩 분할하여 계산하므로 한 자리 숫자만 가능
 """
 repr(i) = i 주어진 값을 표현하는 문자열로 반환
@@ -69,7 +73,7 @@ repr(i) 값이 '1 4\n' 일때
 # for i in [*open(0)][1:]:
 #     print(sum(repr(i).encode('ascii')) % 51)
 
-# 정답 5
+# 정답 6
 """
 b'%a' = 바이너리 데이터 표현식
 b'%a' % i = i 값을 바이너리 데이터로 변환 (repr(i).encode('ascii') 와 동일)
@@ -91,8 +95,8 @@ n = 110
 # for i in [*open(0)][1:]:
 #     print(sum(b'%a' % i) % 51)
 
-# 정답 6
-# [정답 5] 의 51 을 24로 수정
+# 정답 7
+# [정답 6] 의 51 을 24로 수정
 # for i in [*open(0)][1:]: print(sum(b'%a' % i) % 24)
 
 # 테스트
@@ -161,3 +165,5 @@ encode = 바이너리 데이터 반환
 # for line in [*open(0)][1:]:
 #     print([i for i in map(int, line.split())])
 #     print(sum([i for i in map(int, line.split())]))
+
+# print('\n'.join([str(sum(map(int, line.split()))) for line in [*open(0)][1:]]))
