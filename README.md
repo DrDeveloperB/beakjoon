@@ -1,7 +1,7 @@
 # 백준 코딩 테스트
 - python
 - 문제 바로가기 URL: https://www.acmicpc.net/problem/문제번호
-- 쉼표 3개로 구분: 분류,,,문제번호,,,제목
+- 쉼표 3개로 구분: 분류,,,문제번호,,,제목,,,비고
 - 문제 카테고리
     1. 단계별로 풀어보기
         - https://www.acmicpc.net/step
