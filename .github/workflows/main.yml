@@ -6,6 +6,8 @@ jobs:
     steps:
       - run: ls -al
       - uses: actions/checkout@v4
+      - run: ls -al
+      - run: cat .github/workflows/main.yml
 
 # 이렇게 하면 GitHub 리포지토리의 "작업" 탭에 표시되는 워크플로의 이름이 정의됩니다.
 #name: 'Link Checker: All English test 1'
