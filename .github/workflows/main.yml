@@ -1,5 +1,5 @@
 # 이렇게 하면 GitHub 리포지토리의 "작업" 탭에 표시되는 워크플로의 이름이 정의됩니다.
-name: 'Link Checker: All English'
+name: 'Link Checker: All English test 1'
 
 # The `on` key lets you define the events that trigger when the workflow is run. You can define multiple events here. For more information, see "[AUTOTITLE](/actions/using-workflows/triggering-a-workflow#using-events-to-trigger-workflows)."
 on:
