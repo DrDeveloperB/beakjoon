@@ -60,6 +60,6 @@ jobs:
       - run: ls -al   # 브랜치를 체크아웃하여 파일 목록이 보임
       - run: ls -al test-source
       # 수행할 consol 명령어 작성
-      - run: cat ./test-source/github/workflows/devops.yml
+      - run: cat test-source/github/workflows/devops.yml
       # test-source 폴더에서 체크아웃하게되면 최상위 폴더에 github 폴더가 존재하지 않아서 오류 발생
       # - run: cat .github/workflows/devops.yml
