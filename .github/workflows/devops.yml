@@ -5,7 +5,8 @@ on:
       - devops
 jobs:
   checkout:
-    runs-on: ubuntu-latest
+    runs-on: CentOS Linux release 7.9.2009 (Core)
+#    runs-on: ubuntu-latest
     steps:
       - run: ls -al
       - uses: actions/checkout@v4
