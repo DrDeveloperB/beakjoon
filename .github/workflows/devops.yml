@@ -1,4 +1,4 @@
-name: Our Workflow
+name: Development Operations
 on:
   push:
     branches:
