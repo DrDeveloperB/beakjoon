@@ -1,0 +1,13 @@
+name: Our Workflow
+on:
+  push:
+    branches:
+      - devops
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ls -al
+      - uses: actions/checkout@v4
+      - run: ls -al
+      - run: cat .github/workflows/main.yml
