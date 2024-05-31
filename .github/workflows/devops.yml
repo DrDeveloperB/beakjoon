@@ -24,3 +24,18 @@ jobs:
 
       - name: Run Python script
         run: python step/step_2557.py # 이곳에 실제 파이썬 파일명을 적어주세요.
+
+  myjob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        id: hello
+        run: <any>
+        continue-on-error: true
+      - name: Step 2
+        id: world
+        run: <any>
+        continue-on-error: true
+      - name: Check on failures
+        if: steps.hello.outcome != 'success' || steps.world.outcome != 'success'
+        run: exit 1
