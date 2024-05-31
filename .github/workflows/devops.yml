@@ -67,4 +67,4 @@ jobs:
       # test-source 폴더에서 체크아웃하게되면 최상위 폴더에 github 폴더가 존재하지 않아서 오류 발생
 #      - run: cat .github/workflows/devops.yml
       # 변경 이력 출력
-      - run: git log --pretty=online
+      - run: git log --pretty=oneline
