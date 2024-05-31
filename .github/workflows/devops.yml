@@ -23,4 +23,4 @@ jobs:
           python-version: 3.x
 
       - name: Run Python script
-        run: step/step_2557.py # 이곳에 실제 파이썬 파일명을 적어주세요.
+        run: python step/step_2557.py # 이곳에 실제 파이썬 파일명을 적어주세요.
