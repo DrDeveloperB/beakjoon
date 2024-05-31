@@ -48,18 +48,23 @@ jobs:
       # actions : 빈번하게 필요한 반복 단계를 재사용하기 용이하도록 GitHub Actions에서 제공되는 일종의 작업 공유 매커니즘
       # GitHub Marketplace 를 통해 GitHub 뿐만 아니라 다양한 써드 파티 업체들이 공개해놓은 액션을 사용 가능
       # checkout : 체크아웃에 필요한 일련의 과정을 묶어서 제공하는 액션 (repository 에서 CI 서버로 내려받은 후 (fetch, 사용자 인증 포함) 특정 브랜치로 전환)
+      # fetch-depth : 설정한 만큼의 커밋만 내려 받음 (기본값: 1 (최근 1건의 커밋만 내려 받음), 0으로 설정하면 전체 커밋 이력을 내려 받음)
       # v4 : GitHub 에서 제공하는 체크아웃 액션의 최신 버전
       - uses: actions/checkout@v4
         # uses 행위에 입력 파라미터를 넘김
         with:
-          # CI 서버의 최상위 작업 디렉토리 대신에 그 하위에 있는 다른 폴더로 코드를 내려받음
-          # 최상위 작업 디렉토리에 test-source 폴더가 존재하지 않는 경우 test-source 폴더 생성
+          # 최근 3개의 변경 이력을 내려 받음
+          fetch-depth: 3
+          # CI 서버의 최상위 작업 디렉토리 대신에 그 하위에 있는 다른 폴더로 코드를 내려 받음
+          # 최상위 작업 디렉토리에 test-source 폴더가 존재하지 않는 경우 test-source 폴더 생성 (CI 서버에 생성됨)
           # test-source 폴더에서 체크아웃
-          path: test-source
+#          path: test-source
       # 수행할 consol 명령어 작성
-      - run: ls -al   # 브랜치를 체크아웃하여 파일 목록이 보임
-      - run: ls -al test-source
+#      - run: ls -al   # 브랜치를 체크아웃하여 파일 목록이 보임
+#      - run: ls -al test-source
       # 수행할 consol 명령어 작성
-      - run: cat test-source/.github/workflows/devops.yml
+#      - run: cat test-source/.github/workflows/devops.yml
       # test-source 폴더에서 체크아웃하게되면 최상위 폴더에 github 폴더가 존재하지 않아서 오류 발생
-      # - run: cat .github/workflows/devops.yml
+#      - run: cat .github/workflows/devops.yml
+      # 변경 이력 출력
+      - run: git log --pretty=online
