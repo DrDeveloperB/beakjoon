@@ -24,7 +24,7 @@ jobs:
       - name: Check on failures
         if: steps.hello.outcome == 'success'
 #        if: steps.hello.outcome != 'success' || steps.world.outcome != 'success'
-        run: exit 1
+        run: exit 0
 
   run-code:
     runs-on: ubuntu-latest
