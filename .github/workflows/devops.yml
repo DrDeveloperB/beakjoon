@@ -10,21 +10,6 @@ on:
 
 # 워크플로우에서 실행될 작업을 정의합니다.
 jobs:
-  run-code:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-
-      - name: Run Python script
-        run: python step/step_2557.py # 이곳에 실제 파이썬 파일명을 적어주세요.
-
   myjob:
     runs-on: ubuntu-latest
     steps:
@@ -39,3 +24,18 @@ jobs:
       - name: Check on failures
         if: steps.hello.outcome != 'success' || steps.world.outcome != 'success'
         run: exit 1
+
+  run-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Run Python script
+        run: python step/step_2557.py # 이곳에 실제 파이썬 파일명을 적어주세요.
