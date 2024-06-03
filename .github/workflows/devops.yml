@@ -22,7 +22,8 @@ jobs:
         run: ls -al
         continue-on-error: true
       - name: Check on failures
-        if: steps.hello.outcome != 'success' || steps.world.outcome != 'success'
+        if: steps.hello.outcome == 'success'
+#        if: steps.hello.outcome != 'success' || steps.world.outcome != 'success'
         run: exit 1
 
   run-code:
