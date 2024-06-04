@@ -88,15 +88,18 @@ jobs:
 #          ls -al
 #          if [ -f test_1.py ]; then pytest test_1.py; fi
 
-      - name: Check test result
+      - name: Check test result - Success
         # 조건을 사용하여 이전 단계의 결과에 따라 Y 또는 N을 출력합니다.
-        if: ${{ steps.run_tests.outcome == 'success' }}
+        # conclusion 속성은 단계의 최종 상태(성공 또는 실패)를 나타냅니다.
+        if: ${{ steps.run_tests.conclusion == 'success' }}
+#        if: ${{ steps.run_tests.outcome == 'success' }}
         # 이전 단계가 성공했을 경우에만 이 단계를 실행합니다.
 #        if: success()
         run: echo Y
 
-      - name: Display error message
-        if: ${{ steps.run_tests.outcome == 'failure' }}
+      - name: Check test result - Failure (Display error message)
+        if: ${{ steps.run_tests.conclusion == 'failure' }}
+#        if: ${{ steps.run_tests.outcome == 'failure' }}
         # 이전 단계가 실패했을 경우에만 이 단계를 실행합니다.
 #        if: failure()
         run: |
