@@ -40,3 +40,47 @@ jobs:
 
       - name: Run Python script
         run: python step/step_2557.py # 이곳에 실제 파이썬 파일명을 적어주세요.
+
+  # 작업(job)의 이름입니다
+  test:
+    # 작업을 실행할 환경을 정의합니다.
+    # 최신 버전의 Ubuntu에서 실행됨을 의미합니다.
+    runs-on: ubuntu-latest
+
+    # 작업 내에서 수행할 단계를 정의합니다.
+    steps:
+      # GitHub의 공식 액션을 사용하여 리포지토리를 체크아웃(checkout)합니다.
+      - uses: actions/checkout@v4
+
+      # 이 단계의 이름입니다.
+      - name: Set up Python 3.8
+        # GitHub의 공식 액션을 사용하여 Python 3.8을 설정합니다.
+        uses: actions/setup-python@v5
+        # 액션에 전달되는 입력 값들입니다.
+        with:
+          # 설치할 Python의 버전입니다. 여기서는 3.8을 사용합니다.
+          python-version: 3.8
+
+      - name: Install dependencies
+        # 쉘 명령어를 실행합니다.
+        run: |
+          python -m pip install --upgrade pip  # pip을 업그레이드합니다.
+          pip install pytest  # pytest를 설치합니다.
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  # requirements.txt가 있는 경우 종속성을 설치합니다.
+
+      - name: Run tests
+        # 이 단계의 ID입니다. 후속 단계에서 참조할 수 있습니다.
+        id: run_tests
+        # pytest를 사용하여 step/step_2557.py 파일의 테스트를 실행합니다.
+        run: |
+          pytest step/step_2557.py
+
+      - name: Check test result
+        # 이전 단계가 성공했을 경우에만 이 단계를 실행합니다.
+        if: success()
+        run: echo Y
+
+      - name: Check test result
+        # 이전 단계가 실패했을 경우에만 이 단계를 실행합니다.
+        if: failure()
+        run: echo N
