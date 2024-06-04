@@ -77,7 +77,11 @@ jobs:
         id: run_tests
         # 테스트를 실행한 후, 오류가 발생해도 exit 코드를 0으로 설정하여 워크플로우가 중단되지 않도록 합니다.
         # 이렇게 하면 후속 단계에서 테스트 결과를 확인할 수 있습니다.
-        run: pytest test_1.py || exit 0
+        # true 는 exit 0 과 같은 역할을 한다.
+        run: |
+          pytest test_1.py > pytest_output.txt 2>&1 || true  # 오류가 발생해도 계속 실행하고 출력을 파일로 리디렉션합니다.
+#        run: pytest test_1.py || true
+#        run: pytest test_1.py || exit 0
         # pytest는 기본적으로 test_*.py 또는 *_test.py 형식의 파일을 찾고, test_로 시작하는 함수들을 테스트로 인식합니다.
         # pytest를 사용하여 test_1.py 파일의 테스트를 실행합니다.
 #        run: |
@@ -91,8 +95,13 @@ jobs:
 #        if: success()
         run: echo Y
 
-      - name: Check test result
+      - name: Display error message
         if: ${{ steps.run_tests.outcome == 'failure' }}
         # 이전 단계가 실패했을 경우에만 이 단계를 실행합니다.
 #        if: failure()
-        run: echo N
+        run: |
+          echo N
+          cat pytest_output.txt  # 오류 메시지를 출력합니다.
+#        run: |
+#          echo N
+#          cat $(find . -type f -name "*.log" -print0 | xargs -0 ls -1t | head -1) || true  # 오류 메시지를 출력합니다.
