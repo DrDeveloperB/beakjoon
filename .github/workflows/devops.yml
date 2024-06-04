@@ -120,3 +120,6 @@ jobs:
 #        run: |
 #          echo N
 #          cat $(find . -type f -name "*.log" -print0 | xargs -0 ls -1t | head -1) || true  # 오류 메시지를 출력합니다.
+
+      - name: Check List files
+        run: ls -al
