@@ -74,7 +74,7 @@ jobs:
         # pytest를 사용하여 step/step_2557.py 파일의 테스트를 실행합니다.
         run: |
           ls -al
-          if [ -f step/step_2557.py ]; then pytest step/step_2557.py; fi
+          if [ -f test_1.py ]; then pytest test_1.py; fi
 
       - name: Check test result
         # 이전 단계가 성공했을 경우에만 이 단계를 실행합니다.
