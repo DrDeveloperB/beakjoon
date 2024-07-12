@@ -1,4 +1,9 @@
-matplotlib
-numpy
-Flask
-pytz
+# Flask
+#matplotlib==3.9.1
+#numpy==1.23.0
+#flask==3.0.3
+#pytz
+
+# FastAPI
+fastapi==0.111.0
+uvicorn==0.30.1

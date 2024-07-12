@@ -9,10 +9,16 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # 애플리케이션 파일 복사
-COPY app.py .
+# Flask
+# COPY flask_main.py .
+# FastAPI
+COPY fastapi_main.py .
 
 # output 디렉토리 생성
 RUN mkdir /data
 
 # 애플리케이션 실행
-CMD ["python", "app.py"]
+# Flask
+# CMD ["python", "flask_main.py"]
+# FastAPI
+CMD ["python", "fastapi_main.py"]
