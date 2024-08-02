@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Three.js 3D 이미지 예제</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <button id="start">시작</button>
+        <button id="stop">중지</button>
+    </div>
+
+    <script type="importmap">
+        {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.min.js", 
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
+        }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // 씬, 카메라, 렌더러 설정
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 숫자 텍스처를 생성하는 함수
+        function createNumberTexture(number) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 512;
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.font = 'bold 200px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillStyle = 'black';
+            context.fillText(number, canvas.width / 2, canvas.height / 2);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // 큐브의 각 면에 적용할 텍스처 배열 생성
+        const textures = [
+            createNumberTexture('1'),
+            createNumberTexture('2'),
+            createNumberTexture('3'),
+            createNumberTexture('4'),
+            createNumberTexture('5'),
+            createNumberTexture('6')
+        ];
+
+        // 각 면에 숫자가 적힌 텍스처를 적용한 재질 생성
+        const materials = textures.map(texture => new THREE.MeshBasicMaterial({ map: texture }));
+
+        // 큐브의 기하학적 형태 생성
+        const geometry = new THREE.BoxGeometry();
+        const cube = new THREE.Mesh(geometry, materials);
+        scene.add(cube);
+
+        // 카메라 위치 설정
+        camera.position.z = 5;
+
+        // OrbitControls 추가
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // 감속 기능 활성화
+        controls.dampingFactor = 0.25; // 감속 비율
+
+        let isAnimating = true; // 애니메이션 상태 추적 변수
+        let animationId;
+
+        // 애니메이션 함수
+        function animate() {
+            if (isAnimating) {
+                cube.rotation.x += 0.01; // X축 회전
+                cube.rotation.y += 0.01; // Y축 회전
+            }
+            controls.update(); // OrbitControls 업데이트
+            renderer.render(scene, camera);
+            animationId = requestAnimationFrame(animate); // 다음 프레임 요청
+        }
+
+        // "시작" 버튼 클릭 시 애니메이션 시작
+        document.getElementById('start').addEventListener('click', () => {
+            if (!isAnimating) {
+                isAnimating = true;
+                animate();
+            }
+        });
+
+        // "중지" 버튼 클릭 시 애니메이션 중지
+        document.getElementById('stop').addEventListener('click', () => {
+            if (isAnimating) {
+                isAnimating = false;
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        // 초기 애니메이션 호출
+        animate();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Three.js 3D 이미지 예제</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <button id="start">시작</button>
+        <button id="stop">중지</button>
+    </div>
+    <script src="js/threejs.r128.min.js"></script>
+    <script>
+        // 씬, 카메라, 렌더러 설정
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 큐브의 각 면에 적용할 텍스처와 색상 배열
+        const loader = new THREE.TextureLoader();
+        const textureUrl = 'https://cdn-icons-png.flaticon.com/512/7105/7105071.png';
+
+        // 큐브의 면별 재질 배열 생성
+        const materials = [
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(textureUrl), color: 0xff0000 }), // 빨간색 필터
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(textureUrl), color: 0x00ff00 }), // 초록색 필터
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(textureUrl), color: 0x0000ff }), // 파란색 필터
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(textureUrl), color: 0xffff00 }), // 노란색 필터
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(textureUrl), color: 0xff00ff }), // 자홍색 필터
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(textureUrl), color: 0x00ffff })  // 청록색 필터
+        ];
+
+        // 큐브의 기하학적 형태 생성
+        const geometry = new THREE.BoxGeometry();
+        const cube = new THREE.Mesh(geometry, materials);
+        scene.add(cube);
+
+        // 카메라 위치 설정
+        camera.position.z = 5;
+
+        let isAnimating = true; // 애니메이션 상태 추적 변수
+        let animationId;
+
+        // 애니메이션 함수
+        function animate() {
+            if (isAnimating) {
+                cube.rotation.x += 0.01; // X축 회전
+                cube.rotation.y += 0.01; // Y축 회전
+            }
+            renderer.render(scene, camera);
+            animationId = requestAnimationFrame(animate); // 다음 프레임 요청
+        }
+
+        // "시작" 버튼 클릭 시 애니메이션 시작
+        document.getElementById('start').addEventListener('click', () => {
+            if (!isAnimating) {
+                isAnimating = true;
+                animate();
+            }
+        });
+
+        // "중지" 버튼 클릭 시 애니메이션 중지
+        document.getElementById('stop').addEventListener('click', () => {
+            if (isAnimating) {
+                isAnimating = false;
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        // 초기 애니메이션 호출
+        animate();
+    </script>
+</body>
+
+</html>

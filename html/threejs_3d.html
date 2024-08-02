@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Three.js 3D 이미지 예제</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            display: flex;
+        }
+
+        .control-section {
+            margin-right: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        #animation-controls {
+            background-color: #a3d8f4;
+            /* 파스텔톤 파란색 배경 */
+        }
+
+        #rotation-controls {
+            background-color: #b4e6a0;
+            /* 파스텔톤 초록색 배경 */
+        }
+
+        button {
+            margin: 5px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            /* 동그라미의 너비 */
+            height: 20px;
+            /* 동그라미의 높이 */
+            border-radius: 50%;
+            /* 동그란 모양 */
+            background-color: #f0f0f0;
+            /* 동그라미 배경색 */
+            color: #007bff;
+            /* 파란색 아이콘 */
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s, background-color 0.3s;
+            margin-left: 5px;
+            /* 물음표와 텍스트 사이의 여백 */
+            text-align: center;
+        }
+
+        .info-icon:hover {
+            color: #0056b3;
+            /* 어두운 파란색 아이콘 */
+            background-color: #e0e0e0;
+            /* 동그라미 호버시 색상 */
+        }
+
+        .info-overlay {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            min-width: 300px;
+            /* 최소 너비 설정 */
+            max-width: 90vw;
+            /* 화면 너비의 최대 90%로 설정 */
+            font-size: 13px;
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            /* 줄바꿈 방지 */
+            /* 넘치는 내용 숨기기 */
+            /* overflow: hidden;  */
+            /* 넘치는 내용에 말줄임표 추가 */
+            /* text-overflow: ellipsis;  */
+        }
+
+        .overlay-close {
+            position: absolute;
+            top: -12px;
+            /* 레이어 바깥쪽으로 이동 */
+            right: -13px;
+            /* 레이어 바깥쪽으로 이동 */
+            cursor: pointer;
+            font-size: 18px;
+            color: #ff0000;
+            /* 빨간색 */
+            font-weight: bold;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .overlay-close:hover {
+            color: #cc0000;
+            /* 어두운 빨간색 */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <div class="control-section" id="animation-controls">
+            <div class="section-title">애니메이션<span class="info-icon"
+                    onclick="toggleOverlay('animation-overlay')">?</span></div>
+            <button id="start">시작</button>
+            <button id="stop">중지</button>
+            <div id="animation-overlay" class="info-overlay">
+                <span class="overlay-close" onclick="closeOverlay('animation-overlay')">&times;</span>
+                3D 애니메이션 기능을 시작/중지 할 수 있습니다.<br>
+                기능을 중지시키면 마우스 컨트롤도 중지됩니다.
+            </div>
+        </div>
+        <div class="control-section" id="rotation-controls">
+            <div class="section-title">회전<span class="info-icon" onclick="toggleOverlay('rotation-overlay')">?</span>
+            </div>
+            <button id="pause-rotation">일시정지</button>
+            <div id="rotation-overlay" class="info-overlay">
+                <span class="overlay-close" onclick="closeOverlay('rotation-overlay')">&times;</span>
+                자동으로 회전하는 큐브를 일시정지시킬 수 있습니다.<br>
+                3D 애니메이션 기능은 중지되지 않습니다.
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                // 'three' 모듈의 URL을 정의합니다. Three.js의 기본 모듈을 로드합니다.
+                "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.min.js",
+    
+                // 'three/addons/'는 Three.js의 추가 기능 모듈이 위치한 경로입니다.
+                // 여기서는 OrbitControls.js와 같은 추가 모듈을 로드할 수 있습니다.
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three'; // Three.js 라이브러리의 모든 기능을 'THREE' 이름으로 가져옵니다.
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // OrbitControls 모듈을 가져옵니다. 카메라 컨트롤을 추가합니다.
+
+        // 씬, 카메라, 렌더러 설정
+        const scene = new THREE.Scene(); // 새로운 3D 씬을 생성합니다.
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); // 원근 투영 카메라를 생성합니다. 시야각 75도, 종횡비는 현재 창 크기에 맞추고, 가까운 평면과 먼 평면의 거리 설정.
+        const renderer = new THREE.WebGLRenderer(); // WebGLRenderer 객체를 생성합니다. 3D 장면을 렌더링합니다.
+        renderer.setSize(window.innerWidth, window.innerHeight); // 렌더러의 크기를 브라우저 창 크기에 맞춥니다.
+
+        // 배경색 설정 (예: 회색으로 설정)
+        // 기본적으로 Three.js의 WebGLRenderer는 배경색을 설정하지 않으면 투명한 상태로 렌더링됩니다.
+        renderer.setClearColor(0xaaaaaa); // 배경색을 회색으로 설정합니다 (16진수 색상 코드).
+
+        document.body.appendChild(renderer.domElement); // 렌더러의 DOM 요소를 문서의 본문에 추가하여 화면에 표시합니다.
+
+        // 숫자 텍스처를 생성하는 함수
+        function createNumberTexture(number) {
+            const canvas = document.createElement('canvas'); // HTML Canvas 요소를 생성합니다.
+            const context = canvas.getContext('2d'); // CanvasRenderingContext2D를 가져옵니다.
+            canvas.width = 512; // 캔버스의 너비를 512픽셀로 설정합니다.
+            canvas.height = 512; // 캔버스의 높이를 512픽셀로 설정합니다.
+            context.fillStyle = 'white'; // 캔버스의 배경색을 흰색으로 설정합니다.
+            context.fillRect(0, 0, canvas.width, canvas.height); // 캔버스 전체를 흰색으로 채웁니다.
+            context.font = 'bold 200px Arial'; // 텍스트의 폰트를 설정합니다 (두껍고 큰 Arial 폰트).
+            context.textAlign = 'center'; // 텍스트 정렬을 중앙으로 설정합니다.
+            context.textBaseline = 'middle'; // 텍스트의 기준선을 중앙으로 설정합니다.
+            context.fillStyle = 'black'; // 텍스트 색상을 검정색으로 설정합니다.
+            context.fillText(number, canvas.width / 2, canvas.height / 2); // 숫자를 캔버스의 중앙에 그립니다.
+            return new THREE.CanvasTexture(canvas); // 생성한 캔버스를 텍스처로 반환합니다.
+        }
+
+        // 큐브의 각 면에 적용할 텍스처 배열 생성
+        const textures = [
+            createNumberTexture('1'),
+            createNumberTexture('2'),
+            createNumberTexture('3'),
+            createNumberTexture('4'),
+            createNumberTexture('5'),
+            createNumberTexture('6')
+        ]; // 큐브의 각 면에 적용할 텍스처 배열을 생성합니다. 숫자 1부터 6까지의 텍스처를 포함합니다.
+
+        // 각 면에 숫자가 적힌 텍스처를 적용한 재질 생성
+        const materials = textures.map(texture => new THREE.MeshBasicMaterial({ map: texture })); // 각 텍스처를 사용하여 MeshBasicMaterial 객체를 생성하고, 이를 배열로 만듭니다.
+
+        const geometry = new THREE.BoxGeometry(); // 큐브의 기하학적 형태를 생성합니다.
+        const cube = new THREE.Mesh(geometry, materials); // 기하학적 형태와 재질을 결합하여 큐브를 생성합니다.
+        scene.add(cube); // 큐브를 씬에 추가합니다.
+
+        // 큐브에 검정색 라인 추가
+        const edges = new THREE.EdgesGeometry(geometry); // 큐브의 엣지를 추출하여 엣지 기하학을 생성합니다.
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 }); // 검정색 선 재질을 생성합니다.
+        const lines = new THREE.LineSegments(edges, lineMaterial); // 엣지 기하학과 선 재질을 사용하여 선 객체를 생성합니다.
+        cube.add(lines); // 큐브에 검정색 라인을 추가합니다.
+
+        // 카메라 위치 설정
+        camera.position.z = 5; // 카메라를 Z축 방향으로 5만큼 이동시켜 큐브를 볼 수 있도록 합니다.
+
+        // OrbitControls 추가
+        const controls = new OrbitControls(camera, renderer.domElement); // 카메라와 렌더러의 DOM 요소를 사용하여 OrbitControls를 생성합니다.
+        controls.enableDamping = true; // 감속 기능을 활성화하여 부드러운 조작을 지원합니다.
+        controls.dampingFactor = 0.25; // 감속 비율을 설정합니다.
+
+        // 마우스 버튼 컨트롤 설정
+        // controls.mouseButtons = {
+        //     LEFT: THREE.MOUSE.ROTATE,
+        //     MIDDLE: THREE.MOUSE.DOLLY,
+        //     RIGHT: THREE.MOUSE.PAN
+        // };
+
+        let isAnimating = true; // 애니메이션 상태를 추적하는 변수입니다.
+        let isRotating = true; // 큐브 회전 상태를 추적하는 변수입니다.
+        let animationId; // 애니메이션 프레임 ID를 저장하는 변수입니다.
+
+        // 애니메이션 함수
+        function animate() {
+            if (isAnimating) { // 애니메이션이 활성화되어 있는 경우
+                if (isRotating) { // 회전이 활성화되어 있는 경우
+                    cube.rotation.x += 0.01; // 큐브의 X축을 따라 회전합니다.
+                    cube.rotation.y += 0.01; // 큐브의 Y축을 따라 회전합니다.
+                }
+            }
+            controls.update(); // OrbitControls를 업데이트하여 카메라 조작을 반영합니다.
+            renderer.render(scene, camera); // 씬과 카메라를 사용하여 장면을 렌더링합니다.
+            animationId = requestAnimationFrame(animate); // 다음 프레임을 요청하여 애니메이션을 계속합니다.
+        }
+
+        // "시작" 버튼 클릭 시 애니메이션 시작
+        document.getElementById('start').addEventListener('click', () => {
+            if (!isAnimating) { // 애니메이션이 비활성화되어 있는 경우
+                isAnimating = true; // 애니메이션 활성화
+                animate(); // 애니메이션 함수 호출
+            }
+        });
+
+        // "중지" 버튼 클릭 시 애니메이션 중지
+        document.getElementById('stop').addEventListener('click', () => {
+            if (isAnimating) { // 애니메이션이 활성화되어 있는 경우
+                isAnimating = false; // 애니메이션 비활성화
+                cancelAnimationFrame(animationId); // 현재 애니메이션 프레임 요청 취소
+            }
+        });
+
+        // "회전 멈춤" 버튼 클릭 시 큐브 회전 중지
+        document.getElementById('pause-rotation').addEventListener('click', () => {
+            isRotating = !isRotating; // 회전 상태를 토글합니다.
+        });
+
+        // 초기 애니메이션 호출
+        animate(); // 애니메이션을 시작합니다.
+
+    </script>
+
+    <script>
+        function toggleOverlay(overlayId) {
+            const overlays = document.querySelectorAll('.info-overlay');
+            overlays.forEach(overlay => {
+                if (overlay.id !== overlayId) {
+                    overlay.style.display = 'none';
+                }
+            });
+
+            const overlay = document.getElementById(overlayId);
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function closeOverlay(overlayId) {
+            const overlay = document.getElementById(overlayId);
+            overlay.style.display = 'none';
+        }
+
+        document.addEventListener('click', function (event) {
+            const isClickInsideOverlay = event.target.classList.contains('info-icon') || event.target.classList.contains('overlay-close');
+            const overlays = document.querySelectorAll('.info-overlay');
+            overlays.forEach(overlay => {
+                if (!isClickInsideOverlay && !overlay.contains(event.target)) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>
