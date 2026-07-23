@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Rows with Datepicker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+  <style>
+
+
+.unique-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  position: relative;
+
+  display: flex;
+  gap: 20px;
+}
+
+.unique-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.unique-btn-add {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.unique-title {
+  display: grid;
+  grid-template-columns: 2fr 3fr 3fr 1fr;
+  gap: 20px;
+  padding: 10px 0;
+  border-bottom: 2px solid #000;
+  text-align: center;
+}
+
+.unique-row {
+  display: grid;
+  grid-template-columns: 2fr 3fr 3fr 1fr;
+  gap: 20px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.unique-select, .unique-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.unique-btn-delete {
+  color: #fff;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.unique-btn-delete:hover {
+  background-color: #a71d2a;
+}
+
+.unique-left {
+  width: 200px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.unique-right {
+  width: 500px;
+  height: 300px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #fff;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.5s ease, transform 0.5s ease; /* 애니메이션 효과 */
+}
+
+.unique-right.hidden {
+  display: none; /* 초기 상태에서 숨김 */
+}
+
+.unique-list {
+  max-height: 200px; /* 원하는 최대 높이 설정 */
+  overflow-y: auto; /* 세로 스크롤바 표시 */
+  overflow-x: hidden; /* 가로 스크롤바 숨기기 */
+}
+  </style>
+</head>
+<body>
+
+
+    <div class="unique-container">
+        <div class="unique-left">
+            <label>
+              <input type="checkbox" id="toggle-right-div">
+              오른쪽 DIV 보이기
+            </label>
+          </div>
+
+          <div class="unique-right hidden">
+            <div class="unique-content">
+
+                <div class="unique-header">
+                    <button class="unique-btn-add" id="add-row">+ 추가</button>
+                  </div>
+                  <div class="unique-title">
+                    <div>번호</div>
+                    <div>시작일</div>
+                    <div>종료일</div>
+                    <div>삭제</div>
+                  </div>
+                  <div id="rows-container" class="unique-list"></div>
+            </div>
+          </div>
+      </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script>
+
+$(document).ready(function () {
+  $('#toggle-right-div').on('change', function () {
+    if ($(this).is(':checked')) {
+      $('.unique-right').removeClass('hidden').css({
+        opacity: 1,
+        transform: 'translateX(0)'
+      });
+    } else {
+      $('.unique-right').css({
+        opacity: 0,
+        transform: 'translateX(-20px)'
+      }).one('transitionend', function () {
+        $(this).addClass('hidden');
+      });
+    }
+  });
+});
+
+
+
+
+$(document).ready(function () {
+  let rowCount = 0;
+
+  // Datepicker 한글 패치
+  $.datepicker.setDefaults({
+    closeText: "닫기",
+    prevText: "이전달",
+    nextText: "다음달",
+    currentText: "오늘",
+    monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+    monthNamesShort: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+    dayNames: ["일", "월", "화", "수", "목", "금", "토"],
+    dayNamesShort: ["일", "월", "화", "수", "목", "금", "토"],
+    dayNamesMin: ["일", "월", "화", "수", "목", "금", "토"],
+    weekHeader: "주",
+    dateFormat: "yy-mm-dd",
+    firstDay: 0,
+    isRTL: false,
+    showMonthAfterYear: true,
+    yearSuffix: "년"
+  });
+
+  // Create <select> options
+  const selectOptions = Array.from({ length: 10 }, (_, i) => 12340 + i)
+    .map(num => `<option value="${num}">${num}</option>`)
+    .join('');
+
+  function createRow(id, selectValue = "", startDate = "", endDate = "") {
+    return `
+      <div class="unique-row" data-id="${id}">
+        <div>
+          <select class="unique-select">
+            ${selectOptions}
+          </select>
+        </div>
+        <div><input type="text" class="unique-input unique-datepicker start-date" placeholder="시작일" value="${startDate}"></div>
+        <div><input type="text" class="unique-input unique-datepicker end-date" placeholder="종료일" value="${endDate}"></div>
+        <div><button class="unique-btn-delete" data-id="${id}">-</button></div>
+      </div>
+    `;
+  }
+
+  function initDatepicker() {
+    $(".unique-datepicker").datepicker();
+  }
+
+  function addRow(selectValue = "", startDate = "", endDate = "") {
+    rowCount++;
+    const newRow = createRow(rowCount, selectValue, startDate, endDate);
+    $("#rows-container").append(newRow);
+    initDatepicker();
+    if (selectValue) {
+      $(`.unique-row[data-id="${rowCount}"] select`).val(selectValue);
+    }
+  }
+
+  function deleteRow(rowId) {
+    $(`.unique-row[data-id="${rowId}"]`).remove();
+  }
+
+  // Add new row
+  $("#add-row").on("click", () => addRow());
+
+  // Delete row
+  $(document).on("click", ".unique-btn-delete", function () {
+    const rowId = $(this).data("id");
+    deleteRow(rowId);
+  });
+
+  // Initialize page with 3 default rows
+  addRow(12343, "2024-11-14", "2024-11-15");
+  addRow(12345, "2024-11-24", "2024-11-25");
+  addRow(12346, "2024-11-26", "2024-11-27");
+});
+
+
+
+  </script>
+</body>
+</html>

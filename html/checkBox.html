@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동적 체크박스 생성기</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button.danger {
+            background: #dc3545;
+        }
+
+        button.danger:hover {
+            background: #c82333;
+        }
+
+        .checkbox-container {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* 체크박스 스타일 */
+        .agreement-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .agreement-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .agreement-item input[type="checkbox"] {
+            display: none; /* 기본 체크박스 숨기기 */
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%; /* 원형 */
+            margin-right: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* 체크되었을 때 스타일 */
+        .agreement-item input[type="checkbox"]:checked + .custom-checkbox {
+            background-color: #DC2626; /* red-600 */
+            border-color: #DC2626;
+            border-radius: 0.25rem; /* 사각형으로 변경 */
+        }
+
+        /* 체크 상태보다 중간 상태 우선 */
+        .agreement-item input[type="checkbox"]:checked + .custom-checkbox:not(.indeterminate)::after {
+            content: '✓';
+            font-weight: bold;
+            font-size: 1rem;
+            color: #F9FAFB; /* white */
+        }
+
+        /* 중간 상태 스타일 */
+        .custom-checkbox.indeterminate {
+            background-color: #FEF3C7; /* yellow-100 */
+            border-color: #F59E0B; /* amber-500 */
+        }
+
+        .custom-checkbox.indeterminate::after {
+            content: '−';
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #F59E0B; /* amber-500 */
+        }
+
+        .agreement-text {
+            flex: 1;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 5px;
+        }
+
+        .checkbox-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .status-indicator {
+            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-checked {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-unchecked {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-indeterminate {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>동적 체크박스 생성기</h1>
+
+        <div class="controls">
+            <div class="form-group">
+                <label for="checkboxText">체크박스 텍스트:</label>
+                <input type="text" id="checkboxText" placeholder="체크박스 텍스트를 입력하세요" value="새로운 약관에 동의합니다">
+            </div>
+
+            <div class="form-group">
+                <button onclick="createCheckbox(true)">체크된 상태로 생성</button>
+                <button onclick="createCheckbox(false)">체크 해제 상태로 생성</button>
+                <button onclick="createCheckbox('indeterminate')">중간 상태로 생성</button>
+                <button class="danger" onclick="clearAllCheckboxes()">모두 삭제</button>
+            </div>
+        </div>
+
+        <div class="checkbox-container" id="checkboxContainer">
+            <p>생성된 체크박스가 여기에 표시됩니다.</p>
+        </div>
+    </div>
+
+    <script>
+        let checkboxCounter = 0;
+
+        function createCheckbox(initialState) {
+            const text = document.getElementById('checkboxText').value.trim();
+            if (!text) {
+                alert('체크박스 텍스트를 입력해주세요.');
+                return;
+            }
+
+            checkboxCounter++;
+            const checkboxId = `checkbox-${checkboxCounter}`;
+
+            // 체크박스 컨테이너 생성
+            const agreementItem = document.createElement('div');
+            agreementItem.className = 'agreement-item';
+
+            // 실제 체크박스 (숨김)
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.checked = initialState === true;
+
+            // 커스텀 체크박스
+            const customCheckbox = document.createElement('div');
+            customCheckbox.className = 'custom-checkbox';
+
+            // 중간 상태 설정
+            if (initialState === 'indeterminate') {
+                customCheckbox.classList.add('indeterminate');
+                checkbox.checked = true; // 기술적으로는 체크된 상태
+            }
+
+            // 텍스트 라벨
+            const label = document.createElement('label');
+            label.htmlFor = checkboxId;
+            label.className = 'agreement-text';
+            label.textContent = text;
+
+            // 상태 표시기
+            const statusIndicator = document.createElement('span');
+            statusIndicator.className = 'status-indicator';
+            updateStatusIndicator(statusIndicator, initialState);
+
+            // 액션 버튼들
+            const actions = document.createElement('div');
+            actions.className = 'checkbox-actions';
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.textContent = '토글';
+            toggleBtn.onclick = () => toggleCheckbox(checkboxId);
+
+            const indeterminateBtn = document.createElement('button');
+            indeterminateBtn.textContent = '중간';
+            indeterminateBtn.onclick = () => setIndeterminate(checkboxId);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '삭제';
+            deleteBtn.className = 'danger';
+            deleteBtn.onclick = () => deleteCheckbox(agreementItem);
+
+            actions.appendChild(toggleBtn);
+            actions.appendChild(indeterminateBtn);
+            actions.appendChild(deleteBtn);
+
+            // 요소들 조립
+            agreementItem.appendChild(checkbox);
+            agreementItem.appendChild(customCheckbox);
+            agreementItem.appendChild(label);
+            agreementItem.appendChild(statusIndicator);
+            agreementItem.appendChild(actions);
+
+            // 이벤트 리스너 추가
+            checkbox.addEventListener('change', function() {
+                updateStatusIndicator(statusIndicator, this.checked);
+                customCheckbox.classList.remove('indeterminate');
+            });
+
+            // 커스텀 체크박스 클릭 이벤트
+            customCheckbox.addEventListener('click', function() {
+                if (this.classList.contains('indeterminate')) {
+                    this.classList.remove('indeterminate');
+                    checkbox.checked = true;
+                } else {
+                    checkbox.checked = !checkbox.checked;
+                }
+                checkbox.dispatchEvent(new Event('change'));
+            });
+
+            // 라벨 클릭 이벤트
+            label.addEventListener('click', function() {
+                customCheckbox.click();
+            });
+
+            // 컨테이너에 추가
+            const container = document.getElementById('checkboxContainer');
+            if (container.children.length === 1 && container.children[0].tagName === 'P') {
+                container.innerHTML = ''; // 안내 문구 제거
+            }
+            container.appendChild(agreementItem);
+
+            // 입력 필드 초기화
+            document.getElementById('checkboxText').value = '';
+        }
+
+        function updateStatusIndicator(indicator, state) {
+            indicator.className = 'status-indicator';
+            if (state === 'indeterminate') {
+                indicator.classList.add('status-indeterminate');
+                indicator.textContent = '중간';
+            } else if (state === true) {
+                indicator.classList.add('status-checked');
+                indicator.textContent = '체크됨';
+            } else {
+                indicator.classList.add('status-unchecked');
+                indicator.textContent = '체크 해제';
+            }
+        }
+
+        function toggleCheckbox(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            const customCheckbox = checkbox.nextElementSibling;
+            const statusIndicator = customCheckbox.nextElementSibling.nextElementSibling;
+
+            customCheckbox.classList.remove('indeterminate');
+            checkbox.checked = !checkbox.checked;
+            updateStatusIndicator(statusIndicator, checkbox.checked);
+        }
+
+        function setIndeterminate(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            const customCheckbox = checkbox.nextElementSibling;
+            const statusIndicator = customCheckbox.nextElementSibling.nextElementSibling;
+
+            customCheckbox.classList.add('indeterminate');
+            checkbox.checked = true;
+            updateStatusIndicator(statusIndicator, 'indeterminate');
+        }
+
+        function deleteCheckbox(element) {
+            element.remove();
+
+            // 모든 체크박스가 삭제되면 안내 문구 다시 표시
+            const container = document.getElementById('checkboxContainer');
+            if (container.children.length === 0) {
+                container.innerHTML = '<p>생성된 체크박스가 여기에 표시됩니다.</p>';
+            }
+        }
+
+        function clearAllCheckboxes() {
+            const container = document.getElementById('checkboxContainer');
+            container.innerHTML = '<p>생성된 체크박스가 여기에 표시됩니다.</p>';
+        }
+
+        // 페이지 로드 시 예시 체크박스 생성
+        window.addEventListener('load', function() {
+            // 예시 체크박스들 생성
+            document.getElementById('checkboxText').value = '이용약관에 동의합니다';
+            createCheckbox(true);
+
+            document.getElementById('checkboxText').value = '개인정보 처리방침에 동의합니다';
+            createCheckbox(false);
+
+            document.getElementById('checkboxText').value = '마케팅 정보 수신에 동의합니다 (선택)';
+            createCheckbox('indeterminate');
+        });
+    </script>
+</body>
+</html>

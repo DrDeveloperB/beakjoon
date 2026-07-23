@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Car Manual</title>
+    <style>
+        .car-manual-category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        .car-manual-category-card {
+            max-width: 46%;
+            height: auto;
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            transition: border-color 0.3s;
+            padding: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .more-button {
+            max-width: 46%;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="carManualContainer" class="car-manual-category-list"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // 데이터 배열을 받아 블록 생성 및 더보기/접기 구현
+        function createCarManualBlocks(data) {
+            const container = $('#carManualContainer');
+            container.empty(); // 기존 블록 초기화
+
+            // 블록 동적으로 추가
+            data.forEach((item, index) => {
+                const card = $(`<div class="car-manual-category-card">${item}</div>`);
+                if (index >= 6) {
+                    card.addClass('hidden'); // 6번째 이후 블록 숨김
+                }
+                container.append(card);
+            });
+
+            // "더보기" 버튼 추가
+            const moreButton = $('<div class="more-button">더보기 ▼</div>');
+            container.append(moreButton);
+
+            // 버튼 클릭 이벤트
+            moreButton.on('click', function () {
+                const hiddenCards = container.find('.car-manual-category-card.hidden');
+                if (hiddenCards.length > 0) {
+                    hiddenCards.removeClass('hidden'); // 숨겨진 블록 보이기
+                    moreButton.text('접기 ▲');
+                } else {
+                    container.find('.car-manual-category-card').slice(6).addClass('hidden'); // 블록 숨기기
+                    moreButton.text('더보기 ▼');
+                }
+            });
+        }
+
+        // 예제 데이터
+        const exampleData = [
+            'Porsche Connect',
+            '기동성 및 간단한 수리',
+            '에어컨 및 인체 공학',
+            '열고 잠그기',
+            '작동 및 사용',
+            '표시창 및 입력',
+            '추가 블록 1',
+            '추가 블록 2',
+            '추가 블록 3'
+        ];
+
+        // 함수 호출 (데이터 전달)
+        $(document).ready(function () {
+            createCarManualBlocks(exampleData);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Drop Down Box 예제</title>
+    <style>
+        #container {
+            display: flex;
+            align-items: stretch;
+            font-family: Arial, sans-serif;
+            position: relative;
+            /* 부모 컨테이너에 상대적 위치를 설정 */
+            width: 100px;
+        }
+
+        #left-div {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px 0 0 3px;
+            background-color: #f9f9f9;
+            border-right: none;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            /* 왼쪽 div가 공간을 차지하도록 설정 */
+            max-width: 50px;
+        }
+
+        #right-div {
+            display: flex;
+            align-items: center;
+        }
+
+        #arrow-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 0 3px 3px 0;
+            padding: 0 10px;
+            cursor: pointer;
+            font-size: 12px;
+            height: 100%;
+        }
+
+        #dropdown-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            /* 컨테이너 하단에 위치 */
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            /* 다른 요소 위에 표시되도록 설정 */
+        }
+
+        #dropdown-list li {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        #dropdown-list li:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="left-div">GET</div>
+        <div id="right-div">
+            <button id="arrow-btn">▼</button>
+            <ul id="dropdown-list">
+                <li data-value="GET">GET</li>
+                <li data-value="POST">POST</li>
+                <li data-value="PUT">PUT</li>
+                <li data-value="DEL">DELETE</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <script>
+        document.getElementById('arrow-btn').addEventListener('click', function () {
+            var dropdownList = document.getElementById('dropdown-list');
+            dropdownList.style.display = dropdownList.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.querySelectorAll('#dropdown-list li').forEach(function (item) {
+            item.addEventListener('click', function () {
+                var selectedValue = this.getAttribute('data-value');
+                document.getElementById('left-div').innerText = selectedValue;
+                document.getElementById('dropdown-list').style.display = 'none'; // 선택 후 목록 숨김
+            });
+        });
+
+        // 클릭 시 dropdown이 닫히도록 외부 클릭 감지
+        document.addEventListener('click', function (event) {
+            var isClickInside = document.getElementById('container').contains(event.target);
+            if (!isClickInside) {
+                document.getElementById('dropdown-list').style.display = 'none';
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoComplete with Pagination</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        /* 자동완성 목록 스타일 */
+        .ui-autocomplete {
+            max-width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: white;
+            position: absolute;
+        }
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .pagination-controls button {
+            padding: 4px 8px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .pagination-controls span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <input id="search" type="text" placeholder="Type to search...">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 자동완성 목록 데이터
+            const autoCompleteData = [
+                "Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew",
+                "Kiwi", "Lemon", "Mango", "Nectarine", "Orange", "Papaya", "Quince", "Raspberry",
+                "Strawberry", "Tomato", "Ugli Fruit", "Vanilla", "Watermelon", "Xigua", "Yam", "Zucchini"
+            ];
+
+            const itemsPerPage = 5; // 페이지당 항목 수
+            let currentPage = 1; // 초기 페이지
+
+            // 자동완성 설정
+            $("#search").autocomplete({
+                source: function (request, response) {
+                    const filteredData = autoCompleteData.filter(item =>
+                        item.toLowerCase().includes(request.term.toLowerCase())
+                    );
+
+                    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+                    function displayPage(page) {
+                        const start = (page - 1) * itemsPerPage;
+                        const end = start + itemsPerPage;
+                        response(filteredData.slice(start, end));
+                        updatePaginationControls(totalPages, page);
+                    }
+
+                    function updatePaginationControls(totalPages, page) {
+                        const controls = $('<div class="pagination-controls"></div>');
+                        const prevBtn = $('<button>&lt;</button>').click(() => {
+                            if (currentPage > 1) {
+                                currentPage--;
+                                displayPage(currentPage);
+                            }
+                        });
+                        const nextBtn = $('<button>&gt;</button>').click(() => {
+                            if (currentPage < totalPages) {
+                                currentPage++;
+                                displayPage(currentPage);
+                            }
+                        });
+                        const pageIndicator = $(`<span>${page} / ${totalPages}</span>`);
+
+                        if (page === 1) prevBtn.prop("disabled", true);
+                        if (page === totalPages) nextBtn.prop("disabled", true);
+
+                        controls.append(prevBtn, pageIndicator, nextBtn);
+
+                        $(".ui-autocomplete").append(controls); // 목록 아래에 페이지 컨트롤 추가
+                    }
+
+                    displayPage(currentPage);
+                },
+                open: function () {
+                    $(".ui-autocomplete").scrollTop(0); // 페이지 변경 시 스크롤 초기화
+                },
+                minLength: 1 // 최소 입력 글자 수
+            });
+        });
+    </script>
+</body>
+</html>
